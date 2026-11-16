@@ -1,10 +1,10 @@
-# Sessão 04
+# Sessão de IA
 
 | Campo | Valor |
 |-|-|
 | Ferramenta | Claude Code |
-| Data | 2026-11-16 |
-| Observação | Exportação anonimizada: identidade, caminhos locais e metadados de conta removidos; saídas de ferramentas limitadas a 80 linhas. |
+| Data | 2026-11-15 |
+| Observação | Exportação anonimizada: nome, usuário, e-mails, caminhos locais e metadados de conta removidos; saídas de ferramentas limitadas a 80 linhas. |
 
 ### Usuário
 
@@ -155,7 +155,7 @@ Resultado:
 ```
 git version 2.40.1.windows.1
 autocrlf=input
-user=<usuario>amp <email>>
+user=<usuario> <email>
 --- arquivos com CRLF ---
 (nenhum)
 ```
@@ -266,7 +266,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git add .gitignore && git commit -q -F - <<'EOF'\nchore: ignora arquivos locais de configuração\n\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline && git show --stat HEAD | tail -2 && git diff HEAD~1 HEAD && git status --short",
+  "command": "git add .gitignore && git commit -q -F - <<'EOF'\nchore: ignora arquivos locais de configuração\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline && git show --stat HEAD | tail -2 && git diff HEAD~1 HEAD && git status --short",
   "description": "Commit .gitignore change and show log"
 }
 ```
@@ -313,7 +313,7 @@ ecdfa80 chore: importa projeto original do teste técnico
 
 **Duas observações:**
 - **Trailer:** o primeiro commit ficou exatamente com a mensagem que você passou, sem trailer, porque tem só os arquivos da empresa. O segundo leva `Co-Authored-By: Claude Opus 5.5`, como pede o CLAUDE.md §8 para alterações feitas pela IA. Se não quiser o trailer, ainda dá para tirar com `--amend`, porque nada foi enviado ao remoto.
-- **Autor:** os commits saíram com o autor do seu git global, `<usuario>amp <email>>`. Confira se é essa a identidade que você quer usar no teste.
+- **Autor:** os commits saíram com o autor do seu git global, `<usuario> <email>`. Confira se é essa a identidade que você quer usar no teste.
 
 **O que falta:** `CLAUDE.md`, `PLANO-TECNICO.md`, `CONVENCAO-COMMITS.md`, `settings.json`, `protected-files.sha256` e `tools/` continuam untracked. Segundo o CLAUDE.md, eles devem ficar em `docs/`, `.claude/` e `.github/`, mas hoje estão na raiz. Daqui em diante o trabalho vai numa branch (`chore/...`, `fix/...`), não direto na `main`. Não fiz push nem configurei remoto.
 
@@ -662,9 +662,9 @@ Resultado:
 39:| `chore` | Tooling, configuração, `.gitignore`, dependências de dev |
 41:| `docs` | README, `entrega/`, `docs/`, `CLAUDE.md` |
 49:`report`, `cli`, `types`, `logs`, `tooling`, `entrega`. Omita o escopo quando a mudança for transversal.
-65:Co-Authored-By: Claude <email>>
+65:Co-Authored-By: Claude <noreply@anthropic.com>
 69:- `Co-Authored-By:` em commits com código escrito ou proposto pela IA. Isso conversa com
-112:Co-Authored-By: Claude <email>>
+112:Co-Authored-By: Claude <noreply@anthropic.com>
 159:chore: material original do teste técnico ONFLY
 170:| `fix bugs` | Vago, sem escopo, vários defeitos num commit |
 182:chore: material original do teste técnico ONFLY
@@ -733,7 +733,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git commit -q -F - <<'EOF'\nchore: adiciona configuração e documentação para uso de ia\n\nOrganiza o material de apoio ao trabalho com IA nos locais citados no\nCLAUDE.md: plano técnico e convenção de commits em docs/, permissões\ndo Claude Code em .claude/settings.json e checksums dos arquivos\nprotegidos em .github/protected-files.sha256.\n\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline --graph --all && git show --stat --format= HEAD && git status --short",
+  "command": "git commit -q -F - <<'EOF'\nchore: adiciona configuração e documentação para uso de ia\n\nOrganiza o material de apoio ao trabalho com IA nos locais citados no\nCLAUDE.md: plano técnico e convenção de commits em docs/, permissões\ndo Claude Code em .claude/settings.json e checksums dos arquivos\nprotegidos em .github/protected-files.sha256.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline --graph --all && git show --stat --format= HEAD && git status --short",
   "description": "Commit setup files and show log"
 }
 ```
@@ -846,7 +846,7 @@ Resultado:
 33	IGNORED_FILE = PROJECT_ROOT / ".sessoes-ignoradas.local"
 34	MAX_RESULT_LINES = 80
 35	
-36	# Também pega e-mail truncado (sem ".com") e com partes já mascaradas (<usuario>.dev@...).
+36	# Também pega e-mail truncado (sem ".com") e com partes já mascaradas (<usuario>@...).
 37	EMAIL_RE = re.compile(r"[\w.+<>-]+@[\w-]+(?:\.[\w-]+)*")
 38	UUID_RE = re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b", re.I)
 39	SYSTEM_BLOCK_RE = re.compile(
@@ -902,7 +902,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git add tools/exportar_sessoes.py && git commit -q -F - <<'EOF'\nchore(tooling): adiciona script de exportação anonimizada das sessões de ia\n\nGera entrega/uso-de-ia/ a partir das sessões do Claude Code removendo\nidentidade, caminhos locais e metadados de conta, para que o histórico\nde uso de IA possa ser entregue sem expor dados pessoais.\n\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit switch -q main && git merge chore/setup-ia && git switch -c fix/defeitos-relatorio && git log --oneline --graph --all && git status --short && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksums OK\"",
+  "command": "git add tools/exportar_sessoes.py && git commit -q -F - <<'EOF'\nchore(tooling): adiciona script de exportação anonimizada das sessões de ia\n\nGera entrega/uso-de-ia/ a partir das sessões do Claude Code removendo\nidentidade, caminhos locais e metadados de conta, para que o histórico\nde uso de IA possa ser entregue sem expor dados pessoais.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit switch -q main && git merge chore/setup-ia && git switch -c fix/defeitos-relatorio && git log --oneline --graph --all && git status --short && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksums OK\"",
   "description": "Commit tools, merge into main, create fix branch"
 }
 ```
@@ -1577,7 +1577,7 @@ Não descreva o diff linha a linha; o diff já mostra isso.
 
 ```
 Refs: RN-02
-Co-Authored-By: Claude <email>>
+Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 - `Refs:` liga o commit à regra de negócio (rastreabilidade).
@@ -1709,7 +1709,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git add src/onfly_report/services/status_policy.py tests/test_status_policy.py && git commit -q -F - <<'EOF'\nfix(status): considerar faturável somente CONFIRMED (RN-01)\n\nis_billable aceitava qualquer status diferente de CANCELLED, então\nreservas NO_SHOW entravam em noites, valores, by_month e top_hotels.\nNo teste fornecido o total saía 120.00 em vez de 100.00.\n\nCausa raiz: a regra foi escrita por exclusão (!= CANCELLED) em vez de\npor inclusão do único status faturável.\n\nProva: test_status_policy.py falhava para NO_SHOW e passa agora;\ntest_status_rules (fornecido) passa.\n\nRefs: RN-01\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -1",
+  "command": "git add src/onfly_report/services/status_policy.py tests/test_status_policy.py && git commit -q -F - <<'EOF'\nfix(status): considerar faturável somente CONFIRMED (RN-01)\n\nis_billable aceitava qualquer status diferente de CANCELLED, então\nreservas NO_SHOW entravam em noites, valores, by_month e top_hotels.\nNo teste fornecido o total saía 120.00 em vez de 100.00.\n\nCausa raiz: a regra foi escrita por exclusão (!= CANCELLED) em vez de\npor inclusão do único status faturável.\n\nProva: test_status_policy.py falhava para NO_SHOW e passa agora;\ntest_status_rules (fornecido) passa.\n\nRefs: RN-01\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -1",
   "description": "Commit status fix"
 }
 ```
@@ -1810,7 +1810,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git add src/onfly_report/services/stay_calculator.py tests/test_stay_calculator.py && git commit -q -F - <<'EOF'\nfix(nights): usar diferença de datas em vez do dia do mês (RN-02)\n\ncalculate_room_nights subtraía checkout.day - checkin.day, o que só\nfunciona dentro do mesmo mês. Na virada (30/01 -> 02/02) o resultado\nera -28 noites em vez de 3; no dataset real as noites totais ficavam\nnegativas e a média caía no caso \"sem noites\" (0.00).\n\nCausa raiz: subtração de componentes do calendário em vez de subtração\nde datas. Agora usa (checkout - checkin).days * rooms.\n\nProva: test_stay_calculator.py falhava nos casos de virada de mês,\nde ano e de fevereiro bissexto e passa agora; test_nights (fornecido)\npassa.\n\nRefs: RN-02\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -3 && git diff main --stat",
+  "command": "git add src/onfly_report/services/stay_calculator.py tests/test_stay_calculator.py && git commit -q -F - <<'EOF'\nfix(nights): usar diferença de datas em vez do dia do mês (RN-02)\n\ncalculate_room_nights subtraía checkout.day - checkin.day, o que só\nfunciona dentro do mesmo mês. Na virada (30/01 -> 02/02) o resultado\nera -28 noites em vez de 3; no dataset real as noites totais ficavam\nnegativas e a média caía no caso \"sem noites\" (0.00).\n\nCausa raiz: subtração de componentes do calendário em vez de subtração\nde datas. Agora usa (checkout - checkin).days * rooms.\n\nProva: test_stay_calculator.py falhava nos casos de virada de mês,\nde ano e de fevereiro bissexto e passa agora; test_nights (fornecido)\npassa.\n\nRefs: RN-02\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -3 && git diff main --stat",
   "description": "Commit nights fix and show summary"
 }
 ```
@@ -2004,7 +2004,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git add src/onfly_report/services/currency_converter.py tests/test_currency_converter.py && git commit -q -F - <<'EOF'\nfix(currency): multiplicar o valor pela taxa em vez de dividir (RN-03)\n\nconvert_to_brl dividia amount por rate_to_brl, então US$ 100,00 viravam\nR$ 18,45 em vez de R$ 542,00. Todo valor em moeda estrangeira saía\nsubestimado em total_amount_brl, by_month e top_hotels.\n\nCausa raiz: operação invertida; o README define amount * rate_to_brl.\nO uso de float na mesma linha é outro defeito (RN-05) e fica para o\npróximo commit.\n\nProva: test_currency_converter.py falhava para USD e EUR e passa agora;\ntest_currency e test_regression_report (fornecidos) passam.\n\nRefs: RN-03\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -1",
+  "command": "git add src/onfly_report/services/currency_converter.py tests/test_currency_converter.py && git commit -q -F - <<'EOF'\nfix(currency): multiplicar o valor pela taxa em vez de dividir (RN-03)\n\nconvert_to_brl dividia amount por rate_to_brl, então US$ 100,00 viravam\nR$ 18,45 em vez de R$ 542,00. Todo valor em moeda estrangeira saía\nsubestimado em total_amount_brl, by_month e top_hotels.\n\nCausa raiz: operação invertida; o README define amount * rate_to_brl.\nO uso de float na mesma linha é outro defeito (RN-05) e fica para o\npróximo commit.\n\nProva: test_currency_converter.py falhava para USD e EUR e passa agora;\ntest_currency e test_regression_report (fornecidos) passam.\n\nRefs: RN-03\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -1",
   "description": "Commit currency operator fix"
 }
 ```
@@ -2158,7 +2158,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git add src/onfly_report/services/currency_converter.py tests/test_currency_converter.py && git commit -q -F - <<'EOF'\nfix(currency): converter em Decimal exato, sem passar por float (RN-05)\n\nconvert_to_brl convertia amount e rate para float antes de multiplicar.\nO produto perdia precisão: na reserva real RSV-0111 (US$ 84,75 x 5,42)\no exato é 459,345, mas via float vira 459,34499999999997 e arredonda\nhalf-up para 459,34 em vez de 459,35. No dataset real 19 das 235\nreservas confirmadas tinham valor convertido inexato.\n\nCausa raiz: dinheiro passando por float, contra a regra de usar Decimal\nde ponta a ponta e arredondar só na serialização.\n\nProva: test_conversion_is_exact_decimal_without_float falhava com\n459.34499999999997 e passa agora.\n\nRefs: RN-05\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -2",
+  "command": "git add src/onfly_report/services/currency_converter.py tests/test_currency_converter.py && git commit -q -F - <<'EOF'\nfix(currency): converter em Decimal exato, sem passar por float (RN-05)\n\nconvert_to_brl convertia amount e rate para float antes de multiplicar.\nO produto perdia precisão: na reserva real RSV-0111 (US$ 84,75 x 5,42)\no exato é 459,345, mas via float vira 459,34499999999997 e arredonda\nhalf-up para 459,34 em vez de 459,35. No dataset real 19 das 235\nreservas confirmadas tinham valor convertido inexato.\n\nCausa raiz: dinheiro passando por float, contra a regra de usar Decimal\nde ponta a ponta e arredondar só na serialização.\n\nProva: test_conversion_is_exact_decimal_without_float falhava com\n459.34499999999997 e passa agora.\n\nRefs: RN-05\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -2",
   "description": "Commit Decimal conversion fix"
 }
 ```
@@ -2391,7 +2391,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git add src/onfly_report/services/report_builder.py tests/test_ranking.py && git commit -q -F - <<'EOF'\nfix(ranking): ordenar top_hotels por total decrescente e hotel_id crescente (RN-08)\n\ntop_hotels era ordenado por (amount, hotel_id) em ordem crescente, então\no ranking mostrava os hotéis de MENOR valor primeiro. No teste fornecido\nsaía H04, H03, H02 em vez de H01, H02, H03.\n\nCausa raiz: chave de ordenação sem inversão do valor. Inverter a lista\ninteira (reverse=True) também inverteria o desempate, que o README\ndefine como hotel_id ascendente; por isso a chave virou\n(-amount, hotel_id).\n\nProva: test_ranking.py falhava na ordem e no desempate (o dataset real\nnão tem empates, então só o teste novo cobre esse caso) e passa agora;\ntest_top_hotels (fornecido) passa.\n\nRefs: RN-08\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -1",
+  "command": "git add src/onfly_report/services/report_builder.py tests/test_ranking.py && git commit -q -F - <<'EOF'\nfix(ranking): ordenar top_hotels por total decrescente e hotel_id crescente (RN-08)\n\ntop_hotels era ordenado por (amount, hotel_id) em ordem crescente, então\no ranking mostrava os hotéis de MENOR valor primeiro. No teste fornecido\nsaía H04, H03, H02 em vez de H01, H02, H03.\n\nCausa raiz: chave de ordenação sem inversão do valor. Inverter a lista\ninteira (reverse=True) também inverteria o desempate, que o README\ndefine como hotel_id ascendente; por isso a chave virou\n(-amount, hotel_id).\n\nProva: test_ranking.py falhava na ordem e no desempate (o dataset real\nnão tem empates, então só o teste novo cobre esse caso) e passa agora;\ntest_top_hotels (fornecido) passa.\n\nRefs: RN-08\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -1",
   "description": "Commit ranking fix"
 }
 ```
@@ -2487,7 +2487,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git add src/onfly_report/repositories/csv_reservation_repository.py tests/test_reservation_repository.py && git commit -q -F - <<'EOF'\nfix(reader): ler todas as linhas do CSV de reservas (RN-04)\n\nO repositório interrompia a leitura após 200 linhas (`if len(rows) ==\n200: break`). O dataset real tem 300 reservas, então 100 eram\ndescartadas em silêncio: o relatório mostrava 200 reservas e 153\nconfirmadas em vez de 300 e 235, e todos os totais saíam subestimados.\n\nCausa raiz: limite fixo de linhas no laço de leitura. Nenhum teste\nfornecido cobre o caso porque os CSVs de teste têm no máximo 4 linhas.\n\nProva: test_reservation_repository.py falhava com 200 == 250 e passa\nagora.\n\nRefs: RN-04\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline main..HEAD",
+  "command": "git add src/onfly_report/repositories/csv_reservation_repository.py tests/test_reservation_repository.py && git commit -q -F - <<'EOF'\nfix(reader): ler todas as linhas do CSV de reservas (RN-04)\n\nO repositório interrompia a leitura após 200 linhas (`if len(rows) ==\n200: break`). O dataset real tem 300 reservas, então 100 eram\ndescartadas em silêncio: o relatório mostrava 200 reservas e 153\nconfirmadas em vez de 300 e 235, e todos os totais saíam subestimados.\n\nCausa raiz: limite fixo de linhas no laço de leitura. Nenhum teste\nfornecido cobre o caso porque os CSVs de teste têm no máximo 4 linhas.\n\nProva: test_reservation_repository.py falhava com 200 == 250 e passa\nagora.\n\nRefs: RN-04\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline main..HEAD",
   "description": "Commit reader fix and list branch commits"
 }
 ```
@@ -2636,7 +2636,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": ".venv/Scripts/ruff.exe format src/onfly_report/services/report_builder.py && git diff --stat && .venv/Scripts/python.exe -m pytest -q 2>&1 | tail -1 && .venv/Scripts/ruff.exe format --check src && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksum OK\" && git add src/onfly_report/services/report_builder.py && git commit -q -F - <<'EOF'\nstyle(report): aplicar ruff format em report_builder.py\n\nO arquivo original não seguia o formato do ruff (line-length 120 do\npyproject): duas declarações defaultdict e o cálculo da média estavam\nquebradas em várias linhas. Separado dos commits fix para manter o\ndiff das correções legível. Sem mudança de lógica.\n\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -1",
+  "command": ".venv/Scripts/ruff.exe format src/onfly_report/services/report_builder.py && git diff --stat && .venv/Scripts/python.exe -m pytest -q 2>&1 | tail -1 && .venv/Scripts/ruff.exe format --check src && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksum OK\" && git add src/onfly_report/services/report_builder.py && git commit -q -F - <<'EOF'\nstyle(report): aplicar ruff format em report_builder.py\n\nO arquivo original não seguia o formato do ruff (line-length 120 do\npyproject): duas declarações defaultdict e o cálculo da média estavam\nquebradas em várias linhas. Separado dos commits fix para manter o\ndiff das correções legível. Sem mudança de lógica.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -1",
   "description": "Format report_builder and commit as style"
 }
 ```
@@ -2772,7 +2772,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git add requirements-dev.txt && git commit -q -F - <<'EOF'\nchore(tooling): adicionar pytest-cov às dependências de dev\n\nPermite medir a cobertura com pytest --cov=src. A versão 6.0.0 é\ncompatível com pytest 8.3.4 e mede também os subprocessos usados pelos\ntestes fornecidos, que executam o CLI com python -m onfly_report.\n\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline main..HEAD",
+  "command": "git add requirements-dev.txt && git commit -q -F - <<'EOF'\nchore(tooling): adicionar pytest-cov às dependências de dev\n\nPermite medir a cobertura com pytest --cov=src. A versão 6.0.0 é\ncompatível com pytest 8.3.4 e mede também os subprocessos usados pelos\ntestes fornecidos, que executam o CLI com python -m onfly_report.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline main..HEAD",
   "description": "Commit pytest-cov addition"
 }
 ```
@@ -2968,7 +2968,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": ".venv/Scripts/ruff.exe check tests/test_report_contract.py && .venv/Scripts/ruff.exe format --check tests/test_report_contract.py && .venv/Scripts/python.exe -m pytest -q 2>&1 | tail -1 && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksum OK\" && git add tests/test_report_contract.py && git commit -q -F - <<'EOF'\ntest(report): validar relatório da amostra do README e formato do contrato (RN-06, RN-07, RN-09, RN-10)\n\nNenhum teste conferia by_month, a média sem noites, o formato do\ndinheiro, report_version nem o offset de generated_at: essas linhas\neram executadas, mas sem assert. A única prova era um oráculo manual.\n\nAgora main(argv) roda em processo sobre data/exemplo-validacao.csv e o\nrelatório inteiro (menos generated_at) é comparado com a tabela da\nseção \"Amostra de validação\" do README. Casos pequenos cobrem média\n\"0.00\" sem noites CONFIRMED, dinheiro como string de 2 casas sem\nseparador de milhar, half-up em format_money, report_version \"1.0\" e\noffset -03:00.\n\nProva: passam no código corrigido; no código original da main falham\na amostra, a média sem noites e o formato do dinheiro.\n\nRefs: RN-06, RN-07, RN-08, RN-09, RN-10\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -1",
+  "command": ".venv/Scripts/ruff.exe check tests/test_report_contract.py && .venv/Scripts/ruff.exe format --check tests/test_report_contract.py && .venv/Scripts/python.exe -m pytest -q 2>&1 | tail -1 && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksum OK\" && git add tests/test_report_contract.py && git commit -q -F - <<'EOF'\ntest(report): validar relatório da amostra do README e formato do contrato (RN-06, RN-07, RN-09, RN-10)\n\nNenhum teste conferia by_month, a média sem noites, o formato do\ndinheiro, report_version nem o offset de generated_at: essas linhas\neram executadas, mas sem assert. A única prova era um oráculo manual.\n\nAgora main(argv) roda em processo sobre data/exemplo-validacao.csv e o\nrelatório inteiro (menos generated_at) é comparado com a tabela da\nseção \"Amostra de validação\" do README. Casos pequenos cobrem média\n\"0.00\" sem noites CONFIRMED, dinheiro como string de 2 casas sem\nseparador de milhar, half-up em format_money, report_version \"1.0\" e\noffset -03:00.\n\nProva: passam no código corrigido; no código original da main falham\na amostra, a média sem noites e o formato do dinheiro.\n\nRefs: RN-06, RN-07, RN-08, RN-09, RN-10\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -1",
   "description": "Lint, test, checksum and commit item 2"
 }
 ```
@@ -3036,7 +3036,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "git reset --soft HEAD~1 && git status --short && git commit -q -F - <<'EOF'\ntest(report): validar amostra do README e contrato do relatório\n\nNenhum teste conferia by_month, a média sem noites, o formato do\ndinheiro, report_version nem o offset de generated_at: essas linhas\neram executadas, mas sem assert. A única prova era um oráculo manual.\n\nAgora main(argv) roda em processo sobre data/exemplo-validacao.csv e o\nrelatório inteiro (menos generated_at) é comparado com a tabela da\nseção \"Amostra de validação\" do README. Casos pequenos cobrem média\n\"0.00\" sem noites CONFIRMED, dinheiro como string de 2 casas sem\nseparador de milhar, half-up em format_money, report_version \"1.0\" e\noffset -03:00.\n\nProva: passam no código corrigido; no código original da main falham\na amostra, a média sem noites e o formato do dinheiro.\n\nRefs: RN-06, RN-07, RN-08, RN-09, RN-10\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -2 && git log -1 --format=%s | awk '{print \"assunto:\", length($0), \"caracteres\"}'",
+  "command": "git reset --soft HEAD~1 && git status --short && git commit -q -F - <<'EOF'\ntest(report): validar amostra do README e contrato do relatório\n\nNenhum teste conferia by_month, a média sem noites, o formato do\ndinheiro, report_version nem o offset de generated_at: essas linhas\neram executadas, mas sem assert. A única prova era um oráculo manual.\n\nAgora main(argv) roda em processo sobre data/exemplo-validacao.csv e o\nrelatório inteiro (menos generated_at) é comparado com a tabela da\nseção \"Amostra de validação\" do README. Casos pequenos cobrem média\n\"0.00\" sem noites CONFIRMED, dinheiro como string de 2 casas sem\nseparador de milhar, half-up em format_money, report_version \"1.0\" e\noffset -03:00.\n\nProva: passam no código corrigido; no código original da main falham\na amostra, a média sem noites e o formato do dinheiro.\n\nRefs: RN-06, RN-07, RN-08, RN-09, RN-10\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -2 && git log -1 --format=%s | awk '{print \"assunto:\", length($0), \"caracteres\"}'",
   "description": "Soft reset and recommit with short subject"
 }
 ```
@@ -3093,7 +3093,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": ".venv/Scripts/ruff.exe check tests/test_cli_exit_codes.py && .venv/Scripts/ruff.exe format --check tests/test_cli_exit_codes.py && .venv/Scripts/python.exe -m pytest -q 2>&1 | tail -1 && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksum OK\" && git add tests/test_cli_exit_codes.py && git commit -q -F - <<'EOF'\ntest(cli): cobrir códigos de saída 0, 1 e 2 do CLI\n\nO contrato do README define exit 0 para sucesso, 2 para entrada ou\nargumento inválido e 1 para erro inesperado, mas nenhum teste conferia\nos casos de erro: os testes fornecidos só exercitam o caminho feliz.\n\nOs testes chamam main(argv) em processo e cobrem arquivo de reservas\nou de câmbio inexistente, coluna obrigatória ausente, linha com data,\nquartos ou valor inválidos e --top 0, -1 ou não numérico (exit 2), além\nde um erro inesperado simulado no ReportBuilder (exit 1). Em todos os\ncasos de erro o relatório não é gravado.\n\nProva: passam no código atual; cobrem as linhas de tratamento de erro\nde cli.py, dos repositórios e do row_parser, antes sem teste.\n\nRefs: RN-11, RN-12\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -1 && git log -1 --format=%s | awk '{print \"assunto:\", length($0), \"caracteres\"}'",
+  "command": ".venv/Scripts/ruff.exe check tests/test_cli_exit_codes.py && .venv/Scripts/ruff.exe format --check tests/test_cli_exit_codes.py && .venv/Scripts/python.exe -m pytest -q 2>&1 | tail -1 && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksum OK\" && git add tests/test_cli_exit_codes.py && git commit -q -F - <<'EOF'\ntest(cli): cobrir códigos de saída 0, 1 e 2 do CLI\n\nO contrato do README define exit 0 para sucesso, 2 para entrada ou\nargumento inválido e 1 para erro inesperado, mas nenhum teste conferia\nos casos de erro: os testes fornecidos só exercitam o caminho feliz.\n\nOs testes chamam main(argv) em processo e cobrem arquivo de reservas\nou de câmbio inexistente, coluna obrigatória ausente, linha com data,\nquartos ou valor inválidos e --top 0, -1 ou não numérico (exit 2), além\nde um erro inesperado simulado no ReportBuilder (exit 1). Em todos os\ncasos de erro o relatório não é gravado.\n\nProva: passam no código atual; cobrem as linhas de tratamento de erro\nde cli.py, dos repositórios e do row_parser, antes sem teste.\n\nRefs: RN-11, RN-12\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -1 && git log -1 --format=%s | awk '{print \"assunto:\", length($0), \"caracteres\"}'",
   "description": "Lint, test, checksum and commit item 1"
 }
 ```
@@ -3305,7 +3305,7 @@ chore/setup-ia
   main
 --- config local:
 --- autores/committers distintos:
-     14 <usuario>amp <email>> | committer: <usuario>amp <email>>
+     14 <usuario> <email> | committer: <usuario> <email>
 (remotos acima, se houver)
 ```
 
@@ -3316,7 +3316,7 @@ Parei antes de reescrever qualquer coisa. O e-mail que você mandou, `<email>`, 
 O e-mail noreply do GitHub tem um formato parecido com `<email>`. Ele aparece em **GitHub → Settings → Emails**, logo abaixo de "Keep my email addresses private". Se eu reescrever o histórico com o modelo, os commits não ficam ligados à sua conta e tudo teria de ser reescrito outra vez.
 
 Conferi o estado atual:
-- **Commits afetados:** são 14 commits nas três branches (`main`, `chore/setup-ia` e `fix/defeitos-relatorio`). Todos têm `<usuario>amp <email>>` como **autor e também como committer**.
+- **Commits afetados:** são 14 commits nas três branches (`main`, `chore/setup-ia` e `fix/defeitos-relatorio`). Todos têm `<usuario> <email>` como **autor e também como committer**.
 - **Remoto:** não há nenhum configurado, então dá para reescrever sem problema.
 - **E-mail local:** ainda não há `user.email` configurado só neste repositório; hoje vale o do git global.
 
@@ -3398,20 +3398,20 @@ Resultado:
 
 ```
 $ git log --format='%h %an <%ae> %s'
-b13fb14 <usuario>amp <email>> test(cli): cobrir códigos de saída 0, 1 e 2 do CLI
-bf29f37 <usuario>amp <email>> test(report): validar amostra do README e contrato do relatório
-471806e <usuario>amp <email>> chore(tooling): adicionar pytest-cov às dependências de dev
-eb40b04 <usuario>amp <email>> style(report): aplicar ruff format em report_builder.py
-cdb3f80 <usuario>amp <email>> fix(reader): ler todas as linhas do CSV de reservas (RN-04)
-86dc499 <usuario>amp <email>> fix(ranking): ordenar top_hotels por total decrescente e hotel_id crescente (RN-08)
-90ce845 <usuario>amp <email>> fix(currency): converter em Decimal exato, sem passar por float (RN-05)
-c67907e <usuario>amp <email>> fix(currency): multiplicar o valor pela taxa em vez de dividir (RN-03)
-ea7ccd0 <usuario>amp <email>> fix(nights): usar diferença de datas em vez do dia do mês (RN-02)
-a98d1b9 <usuario>amp <email>> fix(status): considerar faturável somente CONFIRMED (RN-01)
-fbd2417 <usuario>amp <email>> chore(tooling): adiciona script de exportação anonimizada das sessões de ia
-f4a758b <usuario>amp <email>> chore: adiciona configuração e documentação para uso de ia
-0438805 <usuario>amp <email>> chore: ignora arquivos locais de configuração
-17ae94a <usuario>amp <email>> chore: importa projeto original do teste técnico
+b13fb14 <usuario> <email> test(cli): cobrir códigos de saída 0, 1 e 2 do CLI
+bf29f37 <usuario> <email> test(report): validar amostra do README e contrato do relatório
+471806e <usuario> <email> chore(tooling): adicionar pytest-cov às dependências de dev
+eb40b04 <usuario> <email> style(report): aplicar ruff format em report_builder.py
+cdb3f80 <usuario> <email> fix(reader): ler todas as linhas do CSV de reservas (RN-04)
+86dc499 <usuario> <email> fix(ranking): ordenar top_hotels por total decrescente e hotel_id crescente (RN-08)
+90ce845 <usuario> <email> fix(currency): converter em Decimal exato, sem passar por float (RN-05)
+c67907e <usuario> <email> fix(currency): multiplicar o valor pela taxa em vez de dividir (RN-03)
+ea7ccd0 <usuario> <email> fix(nights): usar diferença de datas em vez do dia do mês (RN-02)
+a98d1b9 <usuario> <email> fix(status): considerar faturável somente CONFIRMED (RN-01)
+fbd2417 <usuario> <email> chore(tooling): adiciona script de exportação anonimizada das sessões de ia
+f4a758b <usuario> <email> chore: adiciona configuração e documentação para uso de ia
+0438805 <usuario> <email> chore: ignora arquivos locais de configuração
+17ae94a <usuario> <email> chore: importa projeto original do teste técnico
 
 --- main:
 fbd2417 chore(tooling): adiciona script de exportação anonimizada das sessões de ia
@@ -3419,7 +3419,7 @@ fbd2417 chore(tooling): adiciona script de exportação anonimizada das sessões
 --- busca do e-mail antigo nas branches (autor, committer e corpo):
 ocorrências: 0
 committers distintos:
-  <usuario>amp <email>>
+  <usuario> <email>
 
 --- conteúdo idêntico ao backup? (diff de árvore)
 sim, nenhuma diferença de arquivos
@@ -3472,26 +3472,26 @@ O histórico foi reescrito: agora os 14 commits têm `<email>` como autor e como
 
 ### `git log --format='%h %an <%ae> %s'`
 ```
-b13fb14 <usuario>amp <email>> test(cli): cobrir códigos de saída 0, 1 e 2 do CLI
-bf29f37 <usuario>amp <email>> test(report): validar amostra do README e contrato do relatório
-471806e <usuario>amp <email>> chore(tooling): adicionar pytest-cov às dependências de dev
-eb40b04 <usuario>amp <email>> style(report): aplicar ruff format em report_builder.py
-cdb3f80 <usuario>amp <email>> fix(reader): ler todas as linhas do CSV de reservas (RN-04)
-86dc499 <usuario>amp <email>> fix(ranking): ordenar top_hotels por total decrescente e hotel_id crescente (RN-08)
-90ce845 <usuario>amp <email>> fix(currency): converter em Decimal exato, sem passar por float (RN-05)
-c67907e <usuario>amp <email>> fix(currency): multiplicar o valor pela taxa em vez de dividir (RN-03)
-ea7ccd0 <usuario>amp <email>> fix(nights): usar diferença de datas em vez do dia do mês (RN-02)
-a98d1b9 <usuario>amp <email>> fix(status): considerar faturável somente CONFIRMED (RN-01)
-fbd2417 <usuario>amp <email>> chore(tooling): adiciona script de exportação anonimizada das sessões de ia
-f4a758b <usuario>amp <email>> chore: adiciona configuração e documentação para uso de ia
-0438805 <usuario>amp <email>> chore: ignora arquivos locais de configuração
-17ae94a <usuario>amp <email>> chore: importa projeto original do teste técnico
+b13fb14 <usuario> <email> test(cli): cobrir códigos de saída 0, 1 e 2 do CLI
+bf29f37 <usuario> <email> test(report): validar amostra do README e contrato do relatório
+471806e <usuario> <email> chore(tooling): adicionar pytest-cov às dependências de dev
+eb40b04 <usuario> <email> style(report): aplicar ruff format em report_builder.py
+cdb3f80 <usuario> <email> fix(reader): ler todas as linhas do CSV de reservas (RN-04)
+86dc499 <usuario> <email> fix(ranking): ordenar top_hotels por total decrescente e hotel_id crescente (RN-08)
+90ce845 <usuario> <email> fix(currency): converter em Decimal exato, sem passar por float (RN-05)
+c67907e <usuario> <email> fix(currency): multiplicar o valor pela taxa em vez de dividir (RN-03)
+ea7ccd0 <usuario> <email> fix(nights): usar diferença de datas em vez do dia do mês (RN-02)
+a98d1b9 <usuario> <email> fix(status): considerar faturável somente CONFIRMED (RN-01)
+fbd2417 <usuario> <email> chore(tooling): adiciona script de exportação anonimizada das sessões de ia
+f4a758b <usuario> <email> chore: adiciona configuração e documentação para uso de ia
+0438805 <usuario> <email> chore: ignora arquivos locais de configuração
+17ae94a <usuario> <email> chore: importa projeto original do teste técnico
 ```
 Todos os hashes mudaram, o que é esperado numa reescrita. A `main` agora aponta para `fbd2417` e continua sendo a base da branch `fix/defeitos-relatorio`.
 
 ### Busca pelo e-mail antigo
 - **Nas branches `main` e `fix/defeitos-relatorio`:** 0 ocorrências de `<email>` no autor, no committer e no corpo das mensagens.
-- **Committer:** existe um só, `<usuario>amp <email>>`.
+- **Committer:** existe um só, `<usuario> <email>`.
 - **Comparação com o backup:** `git diff` contra as tags não mostra diferença de arquivos. Nome, data de autor, data de commit e mensagens são iguais nos 14 commits.
 
 ### pytest e checksum
@@ -3751,7 +3751,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "grep -nE '[A-Za-z]:[\\\\/]|/c/|Users|<usuario>|@' entrega/README-ENTREGA.md; echo \"(busca por caminho/e-mail acima: vazia = ok)\"; git add entrega/README-ENTREGA.md && git commit -q -F - <<'EOF'\ndocs(entrega): adicionar README-ENTREGA com defeitos e validação\n\nDocumento pedido pelo README: lista dos defeitos corrigidos com causa\nraiz, como foi a investigação (diagnóstico, oráculo independente e TDD\ncom um commit por defeito), comandos de validação, saída real do pytest\ne da cobertura, versões do Python validadas e melhorias futuras.\n\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -1",
+  "command": "grep -nE '[A-Za-z]:[\\\\/]|/c/|Users|<usuario>|@' entrega/README-ENTREGA.md; echo \"(busca por caminho/e-mail acima: vazia = ok)\"; git add entrega/README-ENTREGA.md && git commit -q -F - <<'EOF'\ndocs(entrega): adicionar README-ENTREGA com defeitos e validação\n\nDocumento pedido pelo README: lista dos defeitos corrigidos com causa\nraiz, como foi a investigação (diagnóstico, oráculo independente e TDD\ncom um commit por defeito), comandos de validação, saída real do pytest\ne da cobertura, versões do Python validadas e melhorias futuras.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -1",
   "description": "Check for paths/emails and commit README-ENTREGA"
 }
 ```
@@ -3776,7 +3776,7 @@ Chamada de ferramenta: `Bash`
 
 ```json
 {
-  "command": "grep -nE '[A-Za-z]:[\\\\/]|/c/|Users|<usuario>|@' entrega/uso-de-ia/declaracao.md; echo \"(busca por caminho/e-mail acima: vazia = ok)\"; git add entrega/uso-de-ia/declaracao.md && git commit -q -F - <<'EOF'\ndocs(entrega): adicionar declaração de uso de IA\n\nDocumento pedido pelo README para o caminho com IA: ferramentas e\nmodelo usados, o que a IA fez e o que foi decisão e revisão humana.\n\nCo-Authored-By: Claude Opus 5.5 <email>>\nEOF\ngit log --oneline -3 && echo && .venv/Scripts/python.exe -m pytest -q 2>&1 | tail -1 && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksum OK\" && git status --short",
+  "command": "grep -nE '[A-Za-z]:[\\\\/]|/c/|Users|<usuario>|@' entrega/uso-de-ia/declaracao.md; echo \"(busca por caminho/e-mail acima: vazia = ok)\"; git add entrega/uso-de-ia/declaracao.md && git commit -q -F - <<'EOF'\ndocs(entrega): adicionar declaração de uso de IA\n\nDocumento pedido pelo README para o caminho com IA: ferramentas e\nmodelo usados, o que a IA fez e o que foi decisão e revisão humana.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nEOF\ngit log --oneline -3 && echo && .venv/Scripts/python.exe -m pytest -q 2>&1 | tail -1 && sha256sum -c --quiet .github/protected-files.sha256 && echo \"checksum OK\" && git status --short",
   "description": "Check and commit declaration, rerun checks"
 }
 ```
@@ -3883,3 +3883,292 @@ Chamada de ferramenta: `Bash`
   "timeout": 300000
 }
 ```
+
+Resultado:
+
+```
+gravado: entrega\uso-de-ia\sessao-01.md
+gravado: entrega\uso-de-ia\sessao-02.md
+gravado: entrega\uso-de-ia\sessao-03.md
+gravado: entrega\uso-de-ia\sessao-04.md
+exit=0
+total 528
+drwxr-xr-x 1 <usuario> 197609      0 Nov 15 22:45 .
+drwxr-xr-x 1 <usuario> 197609      0 Nov 15 22:41 ..
+-rw-r--r-- 1 <usuario> 197609    851 Nov 15 22:41 declaracao.md
+-rw-r--r-- 1 <usuario> 197609  84064 Nov 15 22:45 sessao-01.md
+-rw-r--r-- 1 <usuario> 197609 112354 Nov 15 22:45 sessao-02.md
+-rw-r--r-- 1 <usuario> 197609 116335 Nov 15 22:45 sessao-03.md
+-rw-r--r-- 1 <usuario> 197609 207113 Nov 15 22:45 sessao-04.md
+    20 entrega/uso-de-ia/declaracao.md
+  1639 entrega/uso-de-ia/sessao-01.md
+  2192 entrega/uso-de-ia/sessao-02.md
+  2298 entrega/uso-de-ia/sessao-03.md
+  3885 entrega/uso-de-ia/sessao-04.md
+ 10034 total
+```
+
+Chamada de ferramenta: `Bash`
+
+```json
+{
+  "command": "cd <projeto>/entrega/uso-de-ia && for f in sessao-*.md; do echo \"== $f: $(sed -n '7p' $f)\"; done; echo; echo \"--- buscas (contagem de linhas por padrão):\"; for p in '<usuario>' '<usuario>' '<usuario>' 'gmail' '<usuario>' 'noreply\\.github' '@[A-Za-z0-9-]+\\.[A-Za-z]' '[A-Za-z]:[\\\\/]' '/c/' 'Users[\\\\/]' 'AppData' 'scratchpad[\\\\/]' '5bba11e9' '07535946' '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'; do printf '%-75s %s\\n' \"$p\" \"$(cat sessao-*.md | grep -ciE -- \"$p\")\"; done; printf '%-75s %s\\n' \"termos de .redact-terms.local\" \"$(cat sessao-*.md | grep -ciF -f <projeto>/.redact-terms.local)\"",
+  "description": "Search exported sessions for personal data"
+}
+```
+
+Resultado:
+
+```
+== sessao-01.md: | Observação | Exportação anonimizada: identidade, caminhos locais e metadados de conta removidos; saídas de ferramentas limitadas a 80 linhas. |
+== sessao-02.md: | Observação | Exportação anonimizada: identidade, caminhos locais e metadados de conta removidos; saídas de ferramentas limitadas a 80 linhas. |
+== sessao-03.md: | Observação | Exportação anonimizada: identidade, caminhos locais e metadados de conta removidos; saídas de ferramentas limitadas a 80 linhas. |
+== sessao-04.md: | Observação | Exportação anonimizada: identidade, caminhos locais e metadados de conta removidos; saídas de ferramentas limitadas a 80 linhas. |
+
+--- buscas (contagem de linhas por padrão):
+<usuario>                                                                       0
+<usuario>                                                                       0
+<usuario>                                                                   0
+gmail                                                                       3
+<usuario>                                                                   0
+noreply\.github                                                             0
+@[A-Za-z0-9-]+\.[A-Za-z]                                                    0
+[A-Za-z]:[\/]                                                               47
+/c/                                                                         9
+Users[\/]                                                                   2
+AppData                                                                     14
+scratchpad[\/]                                                              18
+5bba11e9                                                                    15
+07535946                                                                    0
+[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}                0
+termos de .redact-terms.local
+```
+
+Chamada de ferramenta: `Bash`
+
+```json
+{
+  "command": "echo \"--- gmail:\"; grep -noiE '.{0,60}gmail.{0,40}' sessao-*.md; echo; echo \"--- Users/:\"; grep -noiE '.{0,50}Users[\\\\/].{0,50}' sessao-*.md; echo; echo \"--- AppData (amostra):\"; grep -noiE '.{0,40}AppData.{0,60}' sessao-*.md | head -6; echo; echo \"--- 5bba11e9 (amostra):\"; grep -noiE '.{0,50}5bba11e9.{0,30}' sessao-*.md | head -4; echo; echo \"--- letra de unidade (distintos):\"; grep -ohiE '[A-Za-z]:[\\\\/][^ \"`)]{0,40}' sessao-*.md | sort | uniq -c | sort -rn | head -15; echo; echo \"--- /c/ :\"; grep -ohiE '.{0,20}/c/[^ \"`]{0,40}' sessao-*.md | sort | uniq -c; echo; echo \"--- redact-terms:\"; grep -ciF -f <projeto>/.redact-terms.local sessao-*.md; echo \"exit grep=$?\"",
+  "description": "Inspect context of suspicious matches"
+}
+```
+
+Resultado:
+
+```
+--- gmail:
+sessao-02.md:1645:uario>|C:\\\\\\\\|C:/|Users|AppData|<usuario>|<usuario>|@gmail|onfly\\\\\\\\|<projeto>\" $(git rev-par
+sessao-02.md:1645:n -i -E \"<usuario>|C:\\\\\\\\|C:/|Users|AppData|<usuario>|@gmail\" | head; echo \"== entrega\"; ls -la e
+sessao-03.md:1645:uario>|C:\\\\\\\\|C:/|Users|AppData|<usuario>|<usuario>|@gmail|onfly\\\\\\\\|<projeto>\" $(git rev-par
+sessao-03.md:1645:n -i -E \"<usuario>|C:\\\\\\\\|C:/|Users|AppData|<usuario>|@gmail\" | head; echo \"== entrega\"; ls -la e
+sessao-03.md:2181:i -E \"<usuario>|C:\\\\\\\\Users|C:/Users|/c/Users|AppData|@gmail|<usuario>\\.<usuario>|sk-ant|ghp_|api[_
+
+--- Users/:
+sessao-02.md:1692:- **caminhos do seu PC** (`C:\Users\...`, `<usuario>`, `AppData`): nenhum nos arquivos
+sessao-03.md:1692:- **caminhos do seu PC** (`C:\Users\...`, `<usuario>`, `AppData`): nenhum nos arquivos
+
+--- AppData (amostra):
+sessao-02.md:1645: -i -E \"<usuario>|C:\\\\\\\\|C:/|Users|AppData|<usuario>|<usuario>|@gmail|onfly\\\\\\\\|<projeto>\" $(g
+sessao-02.md:1645: -i -E \"<usuario>|C:\\\\\\\\|C:/|Users|AppData|<usuario>|@gmail\" | head; echo \"== entrega\"; ls -la entr
+sessao-02.md:1692:seu PC** (`C:\Users\...`, `<usuario>`, `AppData`): nenhum nos arquivos commitados ✅
+sessao-02.md:1720:cura por: caminhos do meu PC (C:\Users, AppData, a pasta do projeto), meu nome de usuário do Windows, qual
+sessao-02.md:1806:cura por: caminhos do meu PC (C:\Users, AppData, a pasta do projeto), meu nome de usuário do Windows, qual
+sessao-02.md:2177:ensível\"; grep -rIl -i -E \"<usuario>|AppData|C:\\\\\\\\Users|C:/Users|/c/Users|<email>|<usuario>\\.<usua
+
+--- 5bba11e9 (amostra):
+sessao-01.md:15:[Image: source: <temp>\claude\5bba11e9cde711f8\<id>\images\1.png]
+sessao-02.md:15:[Image: source: <temp>\claude\5bba11e9cde711f8\<id>\images\1.png]
+sessao-03.md:15:[Image: source: <temp>\claude\5bba11e9cde711f8\<id>\images\1.png]
+sessao-04.md:1229:  "command": "S=\"<temp>/claude/5bba11e9cde711f8/<id>/scratchpad\" && 
+
+--- letra de unidade (distintos):
+     21 e:\n
+      9 s:\
+      6 t:\
+      6 o:\
+      6 l:\
+      5 s:\n
+      4 a:\n
+      4 C:\Users,
+      3 C:\
+      2 t:\n
+      2 h:\n
+      2 e:/,$p'
+      2 C:\\\\\\\\|C:/|Users|AppData|<usuario>|@gma
+      2 C:\\\\\\\\|C:/|Users|AppData|<usuario>|<usu
+      2 C:\Users\...
+
+--- /c/ :
+      1   "command": "/c/Python313/python.exe
+      2 E '[A-Za-z]:[\\\\/]|/c/|Users|<usuario>|@'
+      1 \\\\\Users|C:/Users|/c/Users|<email>|<usuario>\\.<usuario>\
+      1 \\\\\Users|C:/Users|/c/Users|AppData|@gmail|<usuario>\\.<usuari
+      3 a busca por `C:\`, `/c/
+      1 rafia: C:\\x, c:/x, /c/x
+
+--- redact-terms:
+/usr/bin/bash: line 1:  2012 Aborted                 (core dumped) grep -ciF -f <projeto>/.redact-terms.local sessao-*.md
+exit grep=134
+```
+
+Chamada de ferramenta: `Bash`
+
+```json
+{
+  "command": "cd <projeto> && .venv/Scripts/python.exe -I - <<'EOF'\nfrom pathlib import Path\nterms = [t.strip() for t in Path(\".redact-terms.local\").read_text(encoding=\"utf-8\").splitlines() if t.strip()]\ntext = \"\\n\".join(p.read_text(encoding=\"utf-8\").lower() for p in sorted(Path(\"entrega/uso-de-ia\").glob(\"sessao-*.md\")))\nprint(f\"{len(terms)} termos no arquivo; ocorrências por termo (sem exibir o termo):\", [text.count(t.lower()) for t in terms])\nEOF\nfor f in entrega/uso-de-ia/sessao-*.md; do echo \"== $f: $(grep -m1 -A2 '^### Usuário' $f | tail -1 | cut -c1-90)\"; done",
+  "description": "Check redact terms in Python and session openings"
+}
+```
+
+Resultado:
+
+```
+4 termos no arquivo; ocorr�ncias por termo (sem exibir o termo): [0, 0, 0, 0]
+== entrega/uso-de-ia/sessao-01.md: nao edite, nao crie, nao altere nada do projeto, apenas leia. eu recebi esse email da iamg
+== entrega/uso-de-ia/sessao-02.md: nao edite, nao crie, nao altere nada do projeto, apenas leia. eu recebi esse email da iamg
+== entrega/uso-de-ia/sessao-03.md: nao edite, nao crie, nao altere nada do projeto, apenas leia. eu recebi esse email da iamg
+== entrega/uso-de-ia/sessao-04.md: Essa pasta é um teste técnico da Onfly e ainda não está no git. Quero que o primeiro c
+```
+
+Chamada de ferramenta: `Bash`
+
+```json
+{
+  "command": "sed -n '1,60p' entrega/uso-de-ia/sessao-01.md | cut -c1-220; echo ...; echo \"--- 01 vs 02 vs 03 (linhas em comum com a 01):\"; for f in 02 03; do echo \"sessao-$f: $(comm -12 <(sort -u entrega/uso-de-ia/sessao-01.md) <(sort -u entrega/uso-de-ia/sessao-$f.md) | wc -l) linhas iguais à 01\"; done",
+  "description": "Read the pasted email at session start"
+}
+```
+
+Resultado:
+
+````
+# Sessão 01
+
+| Campo | Valor |
+|-|-|
+| Ferramenta | Claude Code |
+| Data | 2026-11-16 |
+| Observação | Exportação anonimizada: identidade, caminhos locais e metadados de conta removidos; saídas de ferramentas limitadas a 80 linhas. |
+
+### Usuário
+
+nao edite, nao crie, nao altere nada do projeto, apenas leia. eu recebi esse email da iamgem no dia 11 e estou pesando se vale a penas e tem tempo suficiente pra rodar e fazer esse projeto ate sua data limite. se eu nao 
+
+### Usuário
+
+[Image: source: <temp>\claude\5bba11e9cde711f8\<id>\images\1.png]
+
+Chamada de ferramenta: `mcp__ccd_turn__update_plan`
+
+```json
+{
+  "items": [
+    {
+      "content": "Ler README, docs e estrutura do projeto",
+      "status": "in_progress"
+    },
+    {
+      "content": "Avaliar código e tamanho do trabalho",
+      "status": "pending"
+    },
+    {
+      "content": "Avaliar prazo e dar recomendação",
+      "status": "pending"
+    }
+  ],
+  "scope": "first_task"
+}
+```
+
+Resultado:
+
+```
+Plan shown (3 steps).
+```
+
+Chamada de ferramenta: `Bash`
+
+```json
+{
+  "command": "find . -path ./.venv -prune -o -path ./.git -prune -o -type f -print | head -100 && echo ---- && wc -l README.md docs/* src/onfly_report/*.py src/onfly_report/*/*.py 2>/dev/null",
+  "description": "List project files and line counts"
+}
+```
+
+Resultado:
+
+```
+Exit code 1
+./.gitignore
+./.pytest_cache/.gitignore
+./.pytest_cache/CACHEDIR.TAG
+...
+--- 01 vs 02 vs 03 (linhas em comum com a 01):
+sessao-02: 880 linhas iguais à 01
+sessao-03: 880 linhas iguais à 01
+````
+
+Chamada de ferramenta: `Bash`
+
+```json
+{
+  "command": "sed -n '11p' entrega/uso-de-ia/sessao-01.md | fold -w 160; echo; echo \"--- '### Usuário' por sessão:\"; grep -c '^### Usuário' entrega/uso-de-ia/sessao-0*.md; echo \"--- primeiras mensagens do usuário em 02 e 03 que não estão na 01:\"; for f in 02 03; do echo \"== $f\"; awk '/^### Usuário/{getline; getline; print substr($0,1,150)}' entrega/uso-de-ia/sessao-$f.md | grep -vxFf <(awk '/^### Usuário/{getline; getline; print substr($0,1,150)}' entrega/uso-de-ia/sessao-01.md) | head -5; done",
+  "description": "Show full first message and compare sessions"
+}
+```
+
+Resultado:
+
+```
+nao edite, nao crie, nao altere nada do projeto, apenas leia. eu recebi esse email da iamgem no dia 11 e estou pesando se vale a penas e tem tempo suficiente pr
+a rodar e fazer esse projeto ate sua data limite. se eu nao foi fazer ou focar em outros projetos. se eu for fazer vou usar o chat do Claude do vs code pra faze
+r, e voce aqui sera as minhas mensagens, me mandatam o que eu devo fazer e pedir pro claude fazer o projeto completo (com mensagens e promts coretos, e naturais
+) e nao deixaram nada que eu fizer aqui escrito no trabalho. avalie tudo isso se [e possível, se vale a pena ou nao e como fazer...
+
+--- '### Usuário' por sessão:
+entrega/uso-de-ia/sessao-01.md:24
+entrega/uso-de-ia/sessao-02.md:30
+entrega/uso-de-ia/sessao-03.md:30
+entrega/uso-de-ia/sessao-04.md:15
+--- primeiras mensagens do usuário em 02 e 03 que não estão na 01:
+== 02
+entao me mande a ordem e promts pra mandar pra ele
+vish mandei errado e ele vai escrever errado no historico: 
+Emails you can use to sign in to your account. Your emails will not be used as the 'from' address for web-based Git operations, e.g. edits and merges.
+<pasted_content id="3bb3">
+<pasted_content id="3bb3">
+== 03
+entao me mande a ordem e promts pra mandar pra ele
+vish mandei errado e ele vai escrever errado no historico: 
+Emails you can use to sign in to your account. Your emails will not be used as the 'from' address for web-based Git operations, e.g. edits and merges.
+<pasted_content id="3bb3">
+<pasted_content id="3bb3">
+```
+
+### Assistente
+
+Parei antes de commitar as sessões, porque achei um problema que não é de dado pessoal e que só você pode decidir.
+
+**O que são as sessões exportadas:**
+- **`sessao-04`** é esta sessão, no Claude Code do VS Code: os testes, as correções e os commits.
+- **`sessao-01`, `02` e `03`** são as suas conversas de planejamento. A 02 e a 03 repetem boa parte da 01 (880 linhas iguais), como se fossem a mesma conversa retomada. Nelas você avalia o prazo, pede a ordem dos prompts para me mandar e cola uma página de configurações de e-mail do GitHub. Logo na primeira mensagem da 01 você escreveu que *"nao deixaram nada que eu fizer aqui escrito no trabalho"*.
+
+O `.sessoes-ignoradas.local` existe justamente para excluir sessões assim, mas essas três não estão nele, ou estão com outro ID. Por isso o script exportou as quatro.
+
+**Dado pessoal:** a verificação não achou nada, nem nas quatro sessões.
+- Seu nome, usuário do Windows, `gmail`, o noreply e os 4 termos do `.redact-terms.local` dão 0 ocorrências reais. Os acertos de `gmail`, `Users` e `AppData` são padrões de `grep` digitados em sessões anteriores.
+- Única ressalva: o ID da pasta temporária do Claude (`5bba11e9cde711f8`) aparece 15 vezes sem máscara. Não identifica você, mas é metadado local. Proponho acrescentá-lo ao `.redact-terms.local` e exportar de novo.
+
+**Decisão sua:**
+
+1. **Só a `sessao-04`.** Coloco os IDs das sessões 01–03 no `.sessoes-ignoradas.local` e exporto de novo. A declaração continua dizendo que o Claude Desktop foi usado para analisar o enunciado e montar os prompts, mas o avaliador não vê essas conversas.
+2. **As quatro sessões.** É a opção mais completa diante do README, que pede *"a exportação da(s) sessão(ões)"*. Ela mostra o planejamento, inclusive a conversa sobre prazo e a frase citada acima.
+
+As duas opções batem com o que a declaração diz. A diferença é quanto do processo fica visível. Não vou escolher por você.
+
+**Estado atual:**
+- Os 4 arquivos `sessao-0N.md` estão no disco e **não foram commitados**.
+- Ainda não fiz o merge na `main` nem criei o repositório.
+- O export final deve rodar só depois do merge e do push, para que esta sessão entre completa. Isso daria um commit de sessões depois do push. Se preferir, commito as sessões agora e atualizo depois com um commit novo.
+
+Me diga se segue com a opção 1 ou 2 e se posso mascarar o ID da pasta temporária. Aí faço o commit das sessões, o merge, e te mostro o comando de `gh repo create` e de push para o seu OK.
