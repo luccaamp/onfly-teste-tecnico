@@ -48,12 +48,8 @@ class ReportBuilder:
 
         confirmed = [row for row in reservations if is_billable(row.status)]
 
-        monthly: dict[str, dict] = defaultdict(
-            lambda: {"reservations": 0, "room_nights": 0, "amount": Decimal("0")}
-        )
-        hotels: dict[str, dict] = defaultdict(
-            lambda: {"hotel_name": "", "room_nights": 0, "amount": Decimal("0")}
-        )
+        monthly: dict[str, dict] = defaultdict(lambda: {"reservations": 0, "room_nights": 0, "amount": Decimal("0")})
+        hotels: dict[str, dict] = defaultdict(lambda: {"hotel_name": "", "room_nights": 0, "amount": Decimal("0")})
 
         total_nights = 0
         total_amount = Decimal("0")
@@ -74,9 +70,7 @@ class ReportBuilder:
             hotels[row.hotel_id]["room_nights"] += room_nights
             hotels[row.hotel_id]["amount"] += amount_brl
 
-        average_nightly_rate = (
-            total_amount / Decimal(total_nights) if total_nights > 0 else Decimal("0")
-        )
+        average_nightly_rate = total_amount / Decimal(total_nights) if total_nights > 0 else Decimal("0")
 
         by_month = [
             {
@@ -88,7 +82,7 @@ class ReportBuilder:
             for month, data in sorted(monthly.items())
         ]
 
-        ranked_hotels = sorted(hotels.items(), key=lambda item: (item[1]["amount"], item[0]))
+        ranked_hotels = sorted(hotels.items(), key=lambda item: (-item[1]["amount"], item[0]))
         top_hotels = [
             {
                 "hotel_id": hotel_id,
