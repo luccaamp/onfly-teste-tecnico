@@ -33,20 +33,17 @@ Baseado em [Conventional Commits 1.0.0](https://www.conventionalcommits.org/pt-b
 
 | Tipo | Quando usar neste projeto |
 |-|-|
-| `fix` | Corrige comportamento divergente do README (D1–D6, M1) |
+| `fix` | Corrige comportamento divergente do README (D1–D7) |
 | `test` | Adiciona/ajusta **testes novos** (nunca os fornecidos) |
-| `refactor` | Muda estrutura sem mudar comportamento (ex.: tipagem para mypy strict) |
 | `chore` | Tooling, configuração, `.gitignore`, dependências de dev |
-| `ci` | GitHub Actions, CodeQL, verificações automáticas |
 | `docs` | README, `entrega/`, `docs/`, `CLAUDE.md` |
 | `style` | Somente formatação (ex.: `ruff format src`), sem lógica |
-| `perf` | Melhoria de desempenho (improvável aqui) |
 | `feat` | **Evitar.** O desafio não pede funcionalidade nova |
 
 ### 1.3 Escopos
 
-Use o componente afetado: `reader`, `rates`, `parser`, `status`, `nights`, `currency`, `ranking`,
-`report`, `cli`, `types`, `logs`, `tooling`, `entrega`. Omita o escopo quando a mudança for transversal.
+Use o componente afetado: `reader`, `status`, `nights`, `currency`, `ranking`, `report`, `cli`,
+`tooling`, `entrega`. Omita o escopo quando a mudança for transversal.
 
 ### 1.4 Corpo
 
@@ -62,7 +59,7 @@ Não descreva o diff linha a linha; o diff já mostra isso.
 
 ```
 Refs: RN-02
-Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
 - `Refs:` liga o commit à regra de negócio (rastreabilidade).
@@ -77,7 +74,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 1. **Atômico:** um defeito por commit. O commit de correção contém **o teste que prova e a correção**.
 2. **Coerente:** a suíte do commit não piora em relação ao anterior. Nada de "commit quebrado no meio".
 3. **Sem mistura:** formatação (`style`) separada de lógica (`fix`), senão o diff da correção fica ilegível.
-4. **Sem lixo:** nada de `output/*.json`, `.venv/`, `mutants/`, `.coverage`, `__pycache__/`.
+4. **Sem lixo:** nada de `output/*.json`, `.venv/`, `.coverage`, `__pycache__/`.
 5. **Arquivos protegidos intactos:** antes de commitar, `sha256sum -c .github/protected-files.sha256`.
 6. **Histórico público é imutável:** nada de `--amend`, `rebase` ou `push --force` depois do push.
    Errou? Faça um novo commit corrigindo (ou `git revert`).
@@ -105,11 +102,11 @@ era -28 noites em vez de 3, contaminando total_room_nights e a média.
 Causa raiz: subtração de componentes do calendário em vez de subtração
 de datas. Agora usa (checkout - checkin).days * rooms.
 
-Prova: test_nights (fornecido) passa; test_properties cobre datas
-aleatórias entre 2000 e 2100, incluindo virada de ano.
+Prova: test_stay_calculator falhava e passa; test_nights (fornecido)
+passa.
 
 Refs: RN-02
-Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
 ```
@@ -120,47 +117,34 @@ O repositório interrompia a leitura após 200 linhas (`if len(rows) ==
 descartadas em silêncio e todos os totais saíam subestimados.
 
 Nenhum teste fornecido cobre esse caso: os CSVs de teste têm poucas
-linhas. Detectado por ruff PLR2004 (número mágico) e pela cobertura de
-ramos (linha do break nunca executada).
+linhas. Detectado comparando o relatório com um cálculo independente
+das regras do README sobre o CSV real.
 
-Prova: test_reader.py::test_reads_more_than_200_rows falhava com 200 e
-passa com 250; oráculo diferencial no dataset real passa.
+Prova: test_reservation_repository falhava e passa.
 
 Refs: RN-04
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
 ```
-fix(currency): multiplicar pela taxa em Decimal, sem float (RN-03, RN-05)
+fix(currency): multiplicar o valor pela taxa em vez de dividir (RN-03)
 
-convert_to_brl tinha dois defeitos na mesma linha: dividia o valor
-pela taxa (100 USD viravam 18,45 BRL em vez de 542,00) e convertia
-para float no meio do cálculo, introduzindo erro binário de
-representação em valores monetários.
+convert_to_brl dividia o valor pela taxa (100 USD viravam 18,45 BRL
+em vez de 542,00).
 
-Agora retorna amount * rates[currency], 100% Decimal.
+Prova: test_currency_converter falhava e passa; test_currency
+(fornecido) passa.
 
-Prova: test_currency (fornecido) passa; propriedade Hypothesis exige
-igualdade exata com amount * rate; regra semgrep no-float-in-money
-deixa de acusar.
-
-Refs: RN-03, RN-05
+Refs: RN-03
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
 ```
-test: adicionar oráculo diferencial sobre o dataset real
-
-Reimplementação ingênua e independente das regras do README (não
-importa nada de src/) comparada com o ReportBuilder em
-reservas_hoteis.csv e exemplo-validacao.csv. Única verificação que
-detecta os seis defeitos simultaneamente.
+chore: importa projeto original do teste técnico
 ```
 
 ```
-chore: material original do teste técnico ONFLY
-```
-
-```
-style(report): aplicar ruff format em src/ sem alteração de lógica
+style(report): aplicar ruff format em report_builder.py
 ```
 
 ### ❌ Mal escritos (e por quê)
@@ -176,30 +160,43 @@ style(report): aplicar ruff format em src/ sem alteração de lógica
 
 ---
 
-## 4. Histórico-alvo do projeto
+## 4. Histórico do projeto
 
 ```
-chore: material original do teste técnico ONFLY
-docs: adicionar CLAUDE.md, plano técnico e convenção de commits
-chore(tooling): configurar ruff, mypy, coverage e pre-commit
-ci: adicionar pipeline de qualidade e verificação de arquivos protegidos
-style: aplicar ruff format em src/ sem alteração de lógica
-test(reader): reproduzir leitura truncada em 200 linhas (RN-04)
-fix(reader): ler todas as linhas do CSV de reservas (RN-04)
+chore: importa projeto original do teste técnico
+chore: ignora arquivos locais de configuração
+chore: adiciona configuração e documentação para uso de ia
+chore(tooling): adiciona script de exportação anonimizada das sessões de ia
 fix(status): considerar faturável somente CONFIRMED (RN-01)
 fix(nights): usar diferença de datas em vez do dia do mês (RN-02)
-fix(currency): multiplicar pela taxa em Decimal, sem float (RN-03, RN-05)
-fix(ranking): ordenar por total desc com desempate por hotel_id (RN-08)
-test: adicionar propriedades Hypothesis para RN-01 a RN-05
-test: adicionar oráculo diferencial sobre o dataset real
-test(cli): cobrir contrato do JSON, exit codes e --top (RN-10 a RN-12)
-fix(cli): retornar exit 2 para moeda sem taxa de câmbio (RN-11)
-refactor(types): tipar ReportBuilder para mypy --strict
-docs(entrega): adicionar README-ENTREGA e declaração de uso de IA
+fix(currency): multiplicar o valor pela taxa em vez de dividir (RN-03)
+fix(currency): converter em Decimal exato, sem passar por float (RN-05)
+fix(ranking): ordenar top_hotels por total decrescente e hotel_id crescente (RN-08)
+fix(reader): ler todas as linhas do CSV de reservas (RN-04)
+style(report): aplicar ruff format em report_builder.py
+chore(tooling): adicionar pytest-cov às dependências de dev
+test(report): validar amostra do README e contrato do relatório
+test(cli): cobrir códigos de saída 0, 1 e 2 do CLI
+docs(entrega): adicionar README-ENTREGA com defeitos e validação
+docs(entrega): adicionar declaração de uso de IA
+docs(entrega): adicionar exportação anonimizada da sessão de IA
+Merge pull request #1 from luccaamp/fix/defeitos-relatorio
+fix(currency): retornar exit 2 para moeda sem taxa de câmbio (RN-11)
+Merge pull request #2 from luccaamp/fix/moeda-sem-taxa
+chore: remover permissões de ferramentas não usadas
+fix(tooling): completar a anonimização da exportação de sessões
+docs(entrega): regerar a sessão de IA com a anonimização corrigida
+docs: alinhar documentação com o que foi implementado
+Merge pull request #3 from luccaamp/docs/revisao-final
 ```
 
-> `test(reader)` antes de `fix(reader)` é opcional: mostra explicitamente o teste vermelho no
-> histórico. Para os demais defeitos, teste e correção vão no mesmo commit.
+Teste e correção vão no mesmo commit `fix`.
+
+> Os quatro primeiros commits (importação e configuração) foram escritos no presente
+> (`importa`, `ignora`, `adiciona`) e entraram direto na `main` (dois commitados nela e dois por
+> merge local fast-forward de `chore/setup-ia`), antes de as regras do imperativo e do fluxo por PR
+> serem aplicadas. Eles não foram reescritos porque a sessão exportada em `entrega/uso-de-ia/` cita
+> os hashes deles. Das correções em diante, tudo segue a convenção e entrou por PR.
 
 ---
 
@@ -219,7 +216,7 @@ Nomes em minúsculas, com hífen, descritivos.
 
 ## 6. Pull Requests
 
-**Título:** mesmo formato do commit (`fix: corrigir defeitos D1–D6 do relatório`).
+**Título:** mesmo formato do commit (`fix: corrigir defeitos do relatório onfly_report`).
 
 **Descrição (modelo):**
 
@@ -230,57 +227,20 @@ O que este PR resolve e por quê.
 ## Mudanças
 | Defeito | Regra | Causa raiz | Teste que prova |
 |-|-|-|-|
-| D2 | RN-02 | subtração de .day em vez de datas | test_nights, test_properties |
+| D2 | RN-02 | subtração de .day em vez de datas | test_nights, test_stay_calculator |
 
 ## Como validar
 pytest -q
 PYTHONPATH=src python -m onfly_report --input data/exemplo-validacao.csv --rates data/taxas_cambio.csv --output output/exemplo.json
 
 ## Checklist
-- [ ] CI verde
+- [ ] `pytest -q` e `ruff check src tests` passando
 - [ ] Arquivos protegidos intactos (checksum)
 - [ ] Contrato do JSON inalterado
 - [ ] Commits seguem docs/CONVENCAO-COMMITS.md
 ```
 
 **Regras:**
-- CI verde é obrigatório para o merge (proteção de branch em *Settings → Branches*).
-- Revisão por IA (CodeRabbit ou Copilot) é bem-vinda: **responda** cada comentário (aceito/recusado e por quê).
-- Merge com **“Create a merge commit”** ou **“Rebase and merge”**. **Não use squash**: ele apaga os
-  commits atômicos que documentam a investigação.
-- Apague a branch após o merge.
+- Merge com **“Create a merge commit”**. **Não use squash**: ele apaga os commits atômicos que
+  documentam a investigação.
 
----
-
-## 7. Release final
-
-Ao concluir a entrega:
-
-```bash
-git tag -a v1.0.0 -m "Entrega do teste técnico ONFLY: defeitos D1–D6 corrigidos"
-git push origin v1.0.0
-```
-
-Depois crie uma *Release* no GitHub a partir da tag, com o resumo do `README-ENTREGA.md`.
-
----
-
-## 8. Validação automática (opcional)
-
-Hook `commit-msg` local que rejeita mensagens fora do padrão. Salve em `.git/hooks/commit-msg` e
-rode `chmod +x .git/hooks/commit-msg`:
-
-```bash
-#!/usr/bin/env bash
-subject=$(head -n1 "$1")
-pattern='^(feat|fix|test|refactor|perf|docs|chore|ci|build|style|revert)(\([a-z0-9-]+\))?!?: [^A-Z].{1,70}[^.]$'
-if ! grep -qP "$pattern" <<< "$subject" && ! grep -qE '^Merge ' <<< "$subject"; then
-  echo "✖ Mensagem fora do padrão (docs/CONVENCAO-COMMITS.md):"
-  echo "  $subject"
-  echo "  Esperado: tipo(escopo): descrição no imperativo, minúscula, sem ponto final"
-  exit 1
-fi
-```
-
-Validado contra os exemplos: aceita `fix(nights): usar diferença de datas… (RN-02)` e
-`chore: material original…`; rejeita `Fixed bug.` e `fix: Corrige`.
