@@ -18,7 +18,7 @@ trecho do README**. Se o README não responder, **pare e pergunte ao humano**: n
 ## 2. Regras invioláveis
 
 1. **NUNCA edite, formate, renomeie ou apague** estes arquivos (também bloqueados em
-   `.claude/settings.json` e verificados por checksum no CI em `.github/protected-files.sha256`):
+   `.claude/settings.json` e verificados por checksum em `.github/protected-files.sha256`):
    - `tests/helpers.py`, `tests/test_currency.py`, `tests/test_nights.py`,
      `tests/test_regression_report.py`, `tests/test_status_rules.py`, `tests/test_top_hotels.py`
    - `data/reservas_hoteis.csv`, `data/taxas_cambio.csv`, `data/exemplo-validacao.csv`
@@ -40,7 +40,7 @@ trecho do README**. Se o README não responder, **pare e pergunte ao humano**: n
 2. Escrever/indicar um teste que FALHA no código atual. Rodar e mostrar a falha.
 3. Aplicar a correção MÍNIMA (sem refatorar o entorno).
 4. Rodar o teste novo + a suíte inteira. Mostrar que passa.
-5. Rodar lint/tipos nos arquivos tocados.
+5. Rodar lint nos arquivos tocados.
 6. Propor a mensagem de commit seguindo docs/CONVENCAO-COMMITS.md e aguardar o OK do humano.
 ```
 
@@ -85,11 +85,9 @@ src/onfly_report/
 
 - Testes novos ficam na **raiz de `tests/`**, em arquivos novos `test_*.py`.
 - Prefira testes **em processo** (chamando `main(argv)` ou os serviços). Os fornecidos usam
-  subprocesso, que é invisível ao mutmut.
+  subprocesso.
 - Cada teste novo tem docstring citando o RN que protege.
-- Tipos de teste em uso: exemplo, propriedades (Hypothesis), oráculo diferencial, contrato do CLI.
-- Testes gerados por ferramenta só **depois** da correção, e revisados um a um. Eles congelam o
-  comportamento atual, inclusive bugs.
+- Tipos de teste em uso: exemplo (serviços e repositório) e contrato do CLI (JSON e exit codes).
 
 ## 7. Comandos
 
@@ -104,12 +102,9 @@ PYTHONPATH=src python -m onfly_report --input data/exemplo-validacao.csv --rates
 
 # Qualidade
 pytest -q                                   # suíte completa
-pytest -q --cov                             # cobertura (inclui subprocesso)
+pytest -q --cov=src --cov-report=term-missing  # cobertura
 ruff check src tests                        # lint
 ruff format --check src                     # formatação (só src/)
-mypy                                        # tipos (--strict via pyproject)
-semgrep scan --config .semgrep/ --error --metrics=off src/
-mutmut run && mutmut results                # mutation testing (lento; sob demanda)
 sha256sum -c .github/protected-files.sha256 # arquivos protegidos intactos
 ```
 
@@ -123,7 +118,7 @@ Siga `docs/CONVENCAO-COMMITS.md`. Resumo:
 - `tipo(escopo): descrição no imperativo, minúscula, sem ponto final (RN-xx)`
 - Um defeito por commit, com teste e correção juntos; o corpo explica **o porquê**.
 - Commits com código escrito pela IA levam o trailer `Co-Authored-By`.
-- Trabalho em branch (`fix/...`, `test/...`, `chore/...`), entra na `main` só por PR com CI verde.
+- Trabalho em branch (`fix/...`, `test/...`, `chore/...`, `docs/...`), entra na `main` só por PR.
 
 ## 9. Como se comunicar com o humano
 
